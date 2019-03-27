@@ -1,14 +1,21 @@
+import datetime
 import socket
-import struct
-import time
 
-NTP_SERVER = '0.uk.pool.ntp.org'
-TIME1970 = 2208988800
+now = datetime.datetime.now()
+print(now)
 
-client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-data = '\x1b' + 47 * '\0'
-client.sendto(data.encode('utf-8'), (NTP_SERVER, 123))
-data, address = client.recvfrom(1024)
-if data: print('Response received from:', address)
-t = struct.unpack('!12I', data)[10] - TIME1970
-print('\tTime = %s' % time.ctime(t))
+correction = int(open('config.txt').read())
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('localhost', 123))
+server.listen(10)
+cl, das = server.accept()
+cl.sendall(str(now).encode())
+cl.close()
+'''
+while True:
+    msg = cl.recv(1024)
+    print(msg)
+    if msg:
+        cl.sendall(str(now).encode())
+        cl.close()'''
